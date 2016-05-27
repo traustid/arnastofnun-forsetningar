@@ -192,28 +192,32 @@ module.exports = Backbone.View.extend({
 	},
 
 	renderMap: function() {
-		var mapBoxLayer = L.tileLayer('http://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-			attribution: 'Imagery from <a href="http://mapbox.com/about/maps/">MapBox</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-			subdomains: 'abcd',
-			id: 'mapbox.outdoors',
-			accessToken: 'pk.eyJ1IjoidHJhdXN0aWQiLCJhIjoib0tQVlcxRSJ9.886zIW04YDanKiDXRWG_SA'
-		});
-
-		var OpenMapSurfer_Roads = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
+		var openMapSurferLayer = L.tileLayer('http://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
 			maxZoom: 20,
 			attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		});
+
+		var esriSatelliteLayer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+			attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 		});
 
 		this.map = L.map(this.el, {
 			center: [64.99329541611105, -18.7261962890625], 
 			zoom: 7,
-			layers: [OpenMapSurfer_Roads],
+			layers: [openMapSurferLayer],
 			scrollWheelZoom: true,
 			zoomControl: false
 		});
 
 		this.markers = L.featureGroup();
 		this.map.addLayer(this.markers);
+
+		var layers = {
+			'Kort (OpenMapSurfer)': openMapSurferLayer,
+			'Loftmynd (ESRI World Imagery)': esriSatelliteLayer
+		};
+
+		L.control.layers(layers).addTo(this.map);
 		
 		new L.Control.Zoom({ position: 'topright' }).addTo(this.map);
 	}
